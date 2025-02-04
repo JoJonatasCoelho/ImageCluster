@@ -6,19 +6,19 @@
 #include "../include/cluster.h"
 #include "../include/pgm.h"
 
-void centroides_iniciais(int k, float *c, pgm *pio){
+void centroides_iniciais(unsigned char *imgData, unsigned long tam, int k, float *c ){
 	for(int i=0; i<k; i++){
-		c[i] = pio->pData[rand()%(pio->c*pio->r)];
+		c[i] = imgData[rand()%(tam)];
 	}
 }
-void calcular_distancia(int k, pgm *pio, float *c, unsigned char *clusters, float *dist){
-	
+
+void calcular_distancia(unsigned char *imgData, unsigned char *clusters, unsigned k, float *c,  float *dist, unsigned long tam){
 
 		for(int j=0; j<k; j++){//for para percorrer os centroides
-			for(unsigned long i=0; i<(pio->r * pio->c); i++){ //for para percorrer os pixels da imagem		
-				float dist_atual = fabsf(c[j]-pio->pData[i]);
+			for(unsigned long i=0; i<(tam); i++){ //for para percorrer os pixels da imagem
+				float dist_atual = fabsf(c[j] - imgData[i]);
 				if(j==0){
-					dist[i] = dist_atual; 
+					dist[i] = dist_atual;
 					clusters[i] = j; // j representa o grupo aqui e mask é uma mascara que determina o grupo pertecente a aquele pixel
 				}
 
@@ -31,83 +31,88 @@ void calcular_distancia(int k, pgm *pio, float *c, unsigned char *clusters, floa
 }
 
 
-void novosCentroides(pgm *pio, float *c, int k){
-	unsigned sum = 0;
-	for(int j=0; j<k; j++){
-		sum = 0;
-		for(unsigned long i=0; i<(pio->r*pio->c); i++){
-			sum += pio->pData[i];
-		}
-		c[j] = sum/(pio->r*pio->c);
+int novosCentroides(unsigned char *imgData, unsigned char *clusters,  unsigned long tam, float *c, unsigned k){
+
+	unsigned long *sums = NULL;
+	if((*sums= malloc(k * sizeof(unsigned long))) == NULL)
+		return EXIT_FAILURE;
+	
+	unsigned long *counts = NULL;
+	if((*counts= malloc(k * sizeof(unsigned long))) == NULL)
+		return EXIT_FAILURE;
+
+	unsigned cluster = 0;
+	for(unsigned long  i=0; i<tam; i++){
+		cluster = *(clusters + i);		
+		*(sums + cluster) += *(imgData + i);
+		*(counts + cluster) += 1;
 	}
+
+	for (unsigned i = 0; i < k; i++)
+	{
+		*(c + i) = *(sums + i) / *(counts + i);
+	}
+	free(counts);
+    free(sums);
+
+	return EXIT_SUCCESS;
+	
 }
 
 int converge(float *c,float *c2, int k){
 	int convergiu = 0;
 	for(int j=0; j<k; j++){
-		if (c2[j] == c[j]) convergiu ++;	
+		if (c2[j] == c[j]) convergiu ++;
 	}
 	if (convergiu = k)
 		return 1;
 	return 0;
 }
-void preencherPGM(const unsigned char const *pDataIn, unsigned char *pDataout,const unsigned char *clusters, const unsigned k, const unsigned long tam, float *c){
+int preencherPGM(const unsigned char const *pDataIn, unsigned char *pDataout,const unsigned char *clusters, const unsigned k, const unsigned long tam, float *c){
 	unsigned char *cores = malloc(sizeof(unsigned char) * k);
-		
+
+    if (!cores) {
+	    fprintf(stderr, "Erro ao alocar memória para cores.\n");
+        return EXIT_FAILURE;
+    }
+
+
 		for(unsigned char i=0; i<k; i++){
 			cores[i] = pDataIn[(int) c[i]];
 
-		} 
+		}
 		for(unsigned long j=0; j<tam; j++){
 			pDataout[j] = cores[clusters[j]];
-		}	
+		}
+		
+		return EXIT_SUCCESS;
 }
 
-int cluster (pgm *pin, pgm *pout, const unsigned k){
-	//int n=0;
+int cluster (unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, unsigned long tam){
+
 	unsigned char convergiu = 0;
 
-	float *dist=malloc((pin->c*pin->r)*sizeof(float));
-	
-	unsigned char *clusters = malloc((pin->r*pin->c) * sizeof(unsigned char));
+	float *dist=malloc((tam) * sizeof(float));
+
+	unsigned char *clusters = malloc((tam) * sizeof(unsigned char));
 	if(!clusters)
-		return 1;
+		return EXIT_FAILURE;
 
 	float *c = malloc(k * sizeof(float));
 	if(!c)
-		return 1;
+		return EXIT_FAILURE;
+
 	float *c2 = malloc(k * sizeof(float));
 	if(!c2)
-		return 1;
-
-	unsigned long tam = ((pin->c)*(pin->r));
-
-/*
-
-	/*do{
-		centroides_iniciais(k, c,pin);
-		calcular_distancia(k, pin , c , clusters, dist);
-		for(int i=0; i<k; i++){
-			c2[i] = c[i];
-		}
-		novosCentroides(pin, c, k);
-		naoConvergiu = converge(c, c2, k);
-		if(n == 0){
-			for(int i=0; i<k; i++) c2[i] = c[i];
-			naoConvergiu = 0;
-		}
-		n++;
-	}while(naoConvergiu || n != MX_INTERA);
-
-	*/
+		return EXIT_FAILURE;
 
 	for(int n = 0; n <= MX_INTERA; n++){
-		centroides_iniciais(k, c,pin);
-		calcular_distancia(k, pin , c , clusters, dist);
+		centroides_iniciais(pDataIn, tam, k, c);
+		calcular_distancia(pDataIn, clusters, k, c, dist, tam);
 		for(int i=0; i<k; i++){
 			c2[i] = c[i];
 		}
-		novosCentroides(pin, c, k);
+		novosCentroides(pDataIn, clusters, tam, c, k);
 		convergiu = converge(c, c2, k);
 		if(n == 0){
 			for(int i=0; i<k; i++) c2[i] = c[i];
@@ -123,10 +128,10 @@ int cluster (pgm *pin, pgm *pout, const unsigned k){
 	free(c2);
 
 
-	preencherPGM(pin->pData,pout->pData, clusters, k, tam, c);
-	
+	preencherPGM(pDataIn, pDataOut, clusters, k, tam, c);
+
 	free(c);
 	free(clusters);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
