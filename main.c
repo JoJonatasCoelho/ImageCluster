@@ -8,6 +8,7 @@ int main(int argc, char *argv[])
     pgm img;
 	pgm out;
 
+
 	if (argc!=4){
 		printf("Formato: \n\t %s <imagemEntrada.pgm> <imagemSaida.pgm> <numeroCluster>\n",argv[0]);
 		exit(1);
@@ -20,9 +21,12 @@ int main(int argc, char *argv[])
 	out.r = img.r;
 	out.mv = img.mv;
 	out.tipo = img.tipo;
+	out.pData = (unsigned char*) malloc(img.c * img.r * sizeof(unsigned char));
 	
 
-	cluster(img.pData, out.pData, k, img.c * img.r );
+	if(cluster(img.pData, out.pData, k, img.c * img.r )){
+		puts("Erro ao clusterizar imagem");
+	}
 
 	writePGMImage(&out, argv[2]);
 

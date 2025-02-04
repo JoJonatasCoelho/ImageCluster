@@ -112,7 +112,7 @@ int cluster (unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, 
 		for(int i=0; i<k; i++){
 			c2[i] = c[i];
 		}
-		novosCentroides(pDataIn, clusters, tam, c, k);
+		if(novosCentroides(pDataIn, clusters, tam, c, k)) return EXIT_FAILURE;
 		convergiu = converge(c, c2, k);
 		if(n == 0){
 			for(int i=0; i<k; i++) c2[i] = c[i];
@@ -128,7 +128,7 @@ int cluster (unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, 
 	free(c2);
 
 
-	preencherPGM(pDataIn, pDataOut, clusters, k, tam, c);
+	if(preencherPGM(pDataIn, pDataOut, clusters, k, tam, c))return EXIT_FAILURE;
 
 	free(c);
 	free(clusters);
