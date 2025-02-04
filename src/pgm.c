@@ -69,9 +69,21 @@ void readPGMImage(pgm *pio, char *filename){
 
 
 void writePGMImage(pgm *pio, char *filename){
+
 	FILE *fp;
 	char ch;
 
+    
+    if (!filename) {
+        fprintf(stderr, "Erro: filename é NULL.\n");
+        exit(1);
+    }
+
+    
+    if (!pio->pData) {
+        fprintf(stderr, "Erro: pio->pData é NULL.\n");
+        exit(1);
+    }
 
 	if (!(fp = fopen(filename,"wb"))){
 		perror("Erro.");

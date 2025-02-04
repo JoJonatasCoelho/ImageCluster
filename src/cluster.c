@@ -10,13 +10,12 @@ void centroides_iniciais(int k, float *c, pgm *pio){
 	for(int i=0; i<k; i++){
 		c[i] = pio->pData[rand()%(pio->c*pio->r)];
 	}
-	puts("saiu da func1");
 }
 void calcular_distancia(int k, pgm *pio, float *c, unsigned char *clusters, float *dist){
 	
 
 		for(int j=0; j<k; j++){//for para percorrer os centroides
-			for(int i=0; i<(pio->r * pio->c); i++){ //for para percorrer os pixels da imagem		
+			for(unsigned long i=0; i<(pio->r * pio->c); i++){ //for para percorrer os pixels da imagem		
 				float dist_atual = fabsf(c[j]-pio->pData[i]);
 				if(j==0){
 					dist[i] = dist_atual; 
@@ -29,7 +28,6 @@ void calcular_distancia(int k, pgm *pio, float *c, unsigned char *clusters, floa
 				}
 			}
 		}
-	puts("saiu da func2");
 }
 
 
@@ -37,12 +35,11 @@ void novosCentroides(pgm *pio, float *c, int k){
 	unsigned sum = 0;
 	for(int j=0; j<k; j++){
 		sum = 0;
-		for(int i=0; i<(pio->r*pio->c); i++){
+		for(unsigned long i=0; i<(pio->r*pio->c); i++){
 			sum += pio->pData[i];
 		}
 		c[j] = sum/(pio->r*pio->c);
 	}
-	puts("saiu da func3");
 }
 
 int converge(float *c,float *c2, int k){
@@ -50,19 +47,20 @@ int converge(float *c,float *c2, int k){
 	for(int j=0; j<k; j++){
 		if (c2[j] == c[j]) convergiu ++;	
 	}
-	printf("saiu da func4 retornou %d \n", convergiu);
 	if (convergiu = k)
 		return 1;
 	return 0;
 }
-void preencherPGM(const unsigned char const *pDataIn, unsigned char *pDataout,const unsigned char *clusters, const unsigned k, const unsigned tam, float *c){
+void preencherPGM(const unsigned char const *pDataIn, unsigned char *pDataout,const unsigned char *clusters, const unsigned k, const unsigned long tam, float *c){
 	unsigned char *cores = malloc(sizeof(unsigned char) * k);
-		for(int i=0; i<k; i++){
+		
+		for(unsigned char i=0; i<k; i++){
 			cores[i] = pDataIn[(int) c[i]];
-		}
-		for(int j=0; j<tam; j++){
+
+		} 
+		for(unsigned long j=0; j<tam; j++){
 			pDataout[j] = cores[clusters[j]];
-		}
+		}	
 }
 
 int cluster (pgm *pin, pgm *pout, const unsigned k){
@@ -82,7 +80,7 @@ int cluster (pgm *pin, pgm *pout, const unsigned k){
 	if(!c2)
 		return 1;
 
-	unsigned tam = ((pin->c)*(pin->r));
+	unsigned long tam = ((pin->c)*(pin->r));
 
 /*
 
@@ -124,15 +122,11 @@ int cluster (pgm *pin, pgm *pout, const unsigned k){
 	free(dist);
 	free(c2);
 
-	puts("saiu la ele");
-
-	printf("pin->pData: %p\n", (void*)pin->pData);
-	printf("pout->pData: %p\n", (void*)pout->pData);
-	printf("clusters: %p\n", (void*)clusters);
-	printf("c: %p\n", (void*)c);
 
 	preencherPGM(pin->pData,pout->pData, clusters, k, tam, c);
+	
 	free(c);
 	free(clusters);
+
 	return 0;
 }

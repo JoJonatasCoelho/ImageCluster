@@ -15,10 +15,16 @@ int main(int argc, char *argv[])
 	int k = atoi(argv[3]);
 
 	readPGMImage(&img,argv[1]);
+
+	out.c  = img.c ;
+	out.r = img.r;
+	out.mv = img.mv;
+	out.tipo = img.tipo;
 	
 
 	cluster(&img, &out, k);
-	writePGMImage(&img, argv[2]);
+
+	writePGMImage(&out, argv[2]);
 
     return EXIT_SUCCESS;
 }
