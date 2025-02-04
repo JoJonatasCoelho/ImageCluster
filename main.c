@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 	out.tipo = img.tipo;
 	
 
-	cluster(&img, &out, k);
+	cluster(img.pData, out.pData, k, img.c * img.r );
 
 	writePGMImage(&out, argv[2]);
 

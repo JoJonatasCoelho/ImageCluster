@@ -34,11 +34,11 @@ void calcular_distancia(unsigned char *imgData, unsigned char *clusters, unsigne
 int novosCentroides(unsigned char *imgData, unsigned char *clusters,  unsigned long tam, float *c, unsigned k){
 
 	unsigned long *sums = NULL;
-	if((*sums= malloc(k * sizeof(unsigned long))) == NULL)
+	if((sums= malloc(k * sizeof(unsigned long))) == NULL)
 		return EXIT_FAILURE;
 	
 	unsigned long *counts = NULL;
-	if((*counts= malloc(k * sizeof(unsigned long))) == NULL)
+	if((counts= malloc(k * sizeof(unsigned long))) == NULL)
 		return EXIT_FAILURE;
 
 	unsigned cluster = 0;
