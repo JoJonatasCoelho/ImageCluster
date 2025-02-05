@@ -36,27 +36,31 @@ int novosCentroides(unsigned char *imgData, unsigned char *clusters,  unsigned l
 	unsigned long *sums = NULL;
 	if((sums= malloc(k * sizeof(unsigned long))) == NULL)
 		return EXIT_FAILURE;
-	
+
 	unsigned long *counts = NULL;
 	if((counts= malloc(k * sizeof(unsigned long))) == NULL)
 		return EXIT_FAILURE;
 
 	unsigned cluster = 0;
 	for(unsigned long  i=0; i<tam; i++){
-		cluster = *(clusters + i);		
+		cluster = *(clusters + i);
 		*(sums + cluster) += *(imgData + i);
 		*(counts + cluster) += 1;
 	}
 
 	for (unsigned i = 0; i < k; i++)
 	{
-		*(c + i) = *(sums + i) / *(counts + i);
+		if (*(counts + i) != 0){
+		    *(c + i) = *(sums + i) / *(counts + i);
+        }else
+            *(c + i) = *(imgData + rand() % tam);
+
 	}
 	free(counts);
     free(sums);
 
 	return EXIT_SUCCESS;
-	
+
 }
 
 int converge(float *c,float *c2, int k){
@@ -64,7 +68,7 @@ int converge(float *c,float *c2, int k){
 	for(int j=0; j<k; j++){
 		if (c2[j] == c[j]) convergiu ++;
 	}
-	if (convergiu = k)
+	if (convergiu == k)
 		return 1;
 	return 0;
 }
@@ -84,10 +88,11 @@ int preencherPGM(const unsigned char const *pDataIn, unsigned char *pDataout,con
 		for(unsigned long j=0; j<tam; j++){
 			pDataout[j] = cores[clusters[j]];
 		}
-		
+
 		return EXIT_SUCCESS;
 }
 
+/*
 int cluster (unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, unsigned long tam){
 
 	unsigned char convergiu = 0;
@@ -134,4 +139,30 @@ int cluster (unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, 
 	free(clusters);
 
 	return EXIT_SUCCESS;
+}
+*/
+
+int cluster(unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, unsigned long tam, float *dist, unsigned char *clusters, float *c, float *c2) {
+    unsigned char convergiu = 0;
+
+    for (int n = 0; n <= MX_INTERA; n++) {
+        centroides_iniciais(pDataIn, tam, k, c);
+        calcular_distancia(pDataIn, clusters, k, c, dist, tam);
+        for (int i = 0; i < k; i++) {
+            c2[i] = c[i];
+        }
+        if (novosCentroides(pDataIn, clusters, tam, c, k)) return EXIT_FAILURE;
+        convergiu = converge(c, c2, k);
+        if (n == 0) {
+            for (int i = 0; i < k; i++) c2[i] = c[i];
+            convergiu = 0;
+        }
+
+        if (convergiu == k)
+            break;
+    }
+
+    if (preencherPGM(pDataIn, pDataOut, clusters, k, tam, c)) return EXIT_FAILURE;
+
+    return EXIT_SUCCESS;
 }
