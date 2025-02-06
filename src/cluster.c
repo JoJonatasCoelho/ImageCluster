@@ -147,7 +147,7 @@ int cluster (unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, 
 }
 */
 
-int cluster(unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, unsigned long tam, float *dist, unsigned char *clusters, float *c, float *c2) {
+int cluster(unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, unsigned long tam, float *dist, unsigned char *clusters, float *c, float *c2, int* groundtruth_mask) {
     unsigned char convergiu = 0;
 
     for (int n = 0; n <= MX_INTERA; n++) {
@@ -168,6 +168,10 @@ int cluster(unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, u
     }
 
     if (preencherPGM(pDataIn, pDataOut, clusters, k, tam, c)) return EXIT_FAILURE;
+
+	double dice = dice_coef((int*)groundtruth_mask, (int*)clusters, tam);
+
+    printf("Coeficiente de Dice: %.3f\n", dice);
 
     return EXIT_SUCCESS;
 }

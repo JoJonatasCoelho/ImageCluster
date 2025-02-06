@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
         }
 
 
-        if (cluster(img.pData, out.pData, k, img.c * img.r, dist, clusters, c, c2)) {
+        if (cluster(img.pData, out.pData, k, img.c * img.r, dist, clusters, c, c2, NULL)) {
 		    puts("Erro ao clusterizar imagem");
 	    }
 
