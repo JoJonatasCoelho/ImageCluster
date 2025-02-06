@@ -5,6 +5,7 @@
 
 #include "../include/cluster.h"
 #include "../include/pgm.h"
+#include "../include/dice.h"
 
 void centroides_iniciais(unsigned char *imgData, unsigned long tam, int k, float *c ){
 	for(int i=0; i<k; i++){
@@ -88,7 +89,7 @@ int preencherPGM(const unsigned char const *pDataIn, unsigned char *pDataout,con
 		return EXIT_SUCCESS;
 }
 
-int cluster (unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, unsigned long tam){
+int cluster (unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, unsigned long tam, int* groundtruth_mask){
 
 	unsigned char convergiu = 0;
 
@@ -123,6 +124,10 @@ int cluster (unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, 
 			break;
 
 	}
+
+	double dice = dice_coef((int*)groundtruth_mask, (int*)clusters, tam);
+
+    printf("Coeficiente de Dice: %.3f\n", dice);
 
 	free(dist);
 	free(c2);

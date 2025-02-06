@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "include/pgm.h"
 #include "include/cluster.h"
+#include "include/dice.h"
 
 int main(int argc, char *argv[])
 {
@@ -24,7 +25,7 @@ int main(int argc, char *argv[])
 	out.pData = (unsigned char*) malloc(img.c * img.r * sizeof(unsigned char));
 	
 
-	if(cluster(img.pData, out.pData, k, img.c * img.r )){
+	if(cluster(img.pData, out.pData, k, img.c * img.r, NULL )){
 		puts("Erro ao clusterizar imagem");
 	}
 

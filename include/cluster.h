@@ -7,5 +7,5 @@ void calcular_distancia(unsigned char *imgData, unsigned char *clusters, unsigne
 int novosCentroides(unsigned char *imgData, unsigned char *clusters,  unsigned long tam, float *c, unsigned k);
 int converge(float *c,float *c2, int k);
 int preencherPGM(const unsigned char const *pDataIn, unsigned char *pDataout,const unsigned char *clusters, const unsigned k, const unsigned long tam, float *c);
-int cluster (unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, unsigned long tam);
+int cluster (unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, unsigned long tam, int* groundtruth_mask);
 #endif
