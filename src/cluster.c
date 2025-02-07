@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #define MX_INTERA 10
 
@@ -8,16 +9,18 @@
 
 void centroides_iniciais(unsigned char *imgData, unsigned long tam, int k, float *c ){
 	for(int i=0; i<k; i++){
-		c[i] = imgData[rand()%(tam)];
+		*(c + i) = imgData[rand() % tam];
 	}
 }
 
 void calcular_distancia(unsigned char *imgData, unsigned char *clusters, unsigned k, float *c,  float *dist, unsigned long tam){
 
+    memset(dist, 0, tam * sizeof(float));
+
 		for(int j=0; j<k; j++){//for para percorrer os centroides
-			for(unsigned long i=0; i<(tam); i++){ //for para percorrer os pixels da imagem
+			for(unsigned long i = 0; i < tam; i++){ //for para percorrer os pixels da imagem
 				float dist_atual = fabsf(c[j] - imgData[i]);
-				if(j==0){
+				if(j == 0){
 					dist[i] = dist_atual;
 					clusters[i] = j; // j representa o grupo aqui e mask é uma mascara que determina o grupo pertecente a aquele pixel
 				}
@@ -87,56 +90,6 @@ int preencherPGM(const unsigned char const *pDataIn, unsigned char *pDataout,con
 		return EXIT_SUCCESS;
 }
 
-/*
-int cluster (unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, unsigned long tam){
-
-	unsigned char convergiu = 0;
-
-	float *dist=malloc((tam) * sizeof(float));
-
-	unsigned char *clusters = malloc((tam) * sizeof(unsigned char));
-	if(!clusters)
-		return EXIT_FAILURE;
-
-	float *c = malloc(k * sizeof(float));
-	if(!c)
-		return EXIT_FAILURE;
-
-	float *c2 = malloc(k * sizeof(float));
-	if(!c2)
-		return EXIT_FAILURE;
-
-	for(int n = 0; n <= MX_INTERA; n++){
-		centroides_iniciais(pDataIn, tam, k, c);
-		calcular_distancia(pDataIn, clusters, k, c, dist, tam);
-		for(int i=0; i<k; i++){
-			c2[i] = c[i];
-		}
-		if(novosCentroides(pDataIn, clusters, tam, c, k)) return EXIT_FAILURE;
-		convergiu = converge(c, c2, k);
-		if(n == 0){
-			for(int i=0; i<k; i++) c2[i] = c[i];
-			convergiu = 0;
-		}
-
-		if(convergiu == k)
-			break;
-
-	}
-
-	free(dist);
-	free(c2);
-
-
-	if(preencherPGM(pDataIn, pDataOut, clusters, k, tam, c))return EXIT_FAILURE;
-
-	free(c);
-	free(clusters);
-
-	return EXIT_SUCCESS;
-}
-*/
-
 int cluster(unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, unsigned long tam, float *dist, unsigned char *clusters, float *c, float *c2) {
     unsigned char convergiu = 0;
 
@@ -152,6 +105,8 @@ int cluster(unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, u
             for (int i = 0; i < k; i++) c2[i] = c[i];
             convergiu = 0;
         }
+
+        printf("%d \n", n);
 
         if (convergiu == k)
             break;
