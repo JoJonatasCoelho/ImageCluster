@@ -2,81 +2,130 @@
 #include <stdlib.h>
 #include <time.h>
 #include <dirent.h>
+#include <string.h>
 #include "include/pgm.h"
 #include "include/cluster.h"
 
-#define QTDIMG 1000
-
 int main(int argc, char *argv[])
 {
+    srand(time(NULL));
 
    	if (argc!=4){
-    	printf("Formato: \n\t %s <./input dir> <output dir> <k clusters>\n",argv[0]);
+    	printf("Formato: \n\t %s <input_dir/> <output_dir/> <k clusters>\n",argv[0]);
 	    exit(1);
    	}
 
+    DIR *d;
+    struct dirent *dir;
+
+    d = opendir(argv[1]);
 
 	clock_t begin, end;
-	double time_per_img, time_total=0;
+	double time_total=0;
 
 
     begin = clock();
 
+    if(!d){
+        perror("Erro ao abrir diretório");
+        return EXIT_FAILURE;
+    }
 
-	int k = atoi(argv[3]);
+    int k = atoi(argv[3]);
 
     float *dist = NULL;
     unsigned char *clusters = NULL;
     float *c = NULL;
     float *c2 = NULL;
 
-	for (unsigned long i=0; i<QTDIMG; i++){
+
+    char filepath[1024]; // buffer para armazenar o caminho completo
+    char outpath[1024]; // mesma coisa para o caminho de saida
+
+
+
+    while ((dir = readdir(d)) != NULL){
 
         pgm img = {0};
         pgm out = {0};
+        // zero o valor dos structs sempre
 
-	    readPGMImage(&img,argv[1]);
-
-    	out.c  = img.c;
-	    out.r = img.r;
-    	out.mv = img.mv;
-    	out.tipo = img.tipo;
-    	out.pData = (unsigned char*) malloc(img.c * img.r * sizeof(unsigned char));
-        if (!out.pData) {
-            fprintf(stderr, "Erro ao alocar memória para out.pData.\n");
-            exit(1);
+        if (strcmp(dir->d_name, ".") == 0 || strcmp(dir->d_name, "..") == 0) { // pra se livrar de um bug
+            continue;
         }
 
-        if (!dist) dist = malloc(img.c * img.r * sizeof(float));
-        if (!clusters) clusters = malloc(img.c * img.r * sizeof(unsigned char));
+        snprintf(filepath, sizeof(filepath), "%s%s", argv[1], dir->d_name); //formatando o caminho para "filepath"
+
+        readPGMImage(&img, filepath);
+
+        if (!img.pData) {
+            fprintf(stderr, "Erro ao ler a imagem: %s\n", filepath);
+            continue; // Pula para a próxima iteração caso erro em alguma imagem
+        }
+
+        out.c = img.c;
+        out.r = img.r;
+        out.mv = img.mv;
+        out.tipo = img.tipo;
+
+        out.pData = (unsigned char*) malloc(img.c * img.r * sizeof(unsigned char));
+        if (!out.pData) {
+            fprintf(stderr, "Erro ao alocar memória para out.pData.\n");
+            continue;
+        }
+
         if (!c) c = malloc(k * sizeof(float));
         if (!c2) c2 = malloc(k * sizeof(float));
+
+        dist = malloc(img.c * img.r * sizeof(float));
+        clusters = malloc(img.c * img.r * sizeof(unsigned char));
 
         if (!dist || !clusters || !c || !c2) {
             fprintf(stderr, "Erro ao alocar memória para buffers reutilizáveis.\n");
             free(img.pData);
             free(out.pData);
-            return EXIT_FAILURE;
+            closedir(d);
+            return EXIT_FAILURE; // se os buffers nao sao criados adequamente apenas fecho o programa
         }
 
 
         if (cluster(img.pData, out.pData, k, img.c * img.r, dist, clusters, c, c2)) {
-		    puts("Erro ao clusterizar imagem");
-	    }
+            fprintf(stderr, "Erro ao clusterizar imagem.\n");
+            return EXIT_FAILURE; // a clusterizaçao falhou
+        }
 
 
         if (!img.pData || !out.pData) {
             fprintf(stderr, "Erro: img.pData ou out.pData é NULL.\n");
-            exit(1);
+            return EXIT_FAILURE;
         }
 
-	    writePGMImage(&out, argv[2]);
 
-        free(img.pData);
+        snprintf(outpath, sizeof(outpath), "%s%s%s",  argv[2], "out-",dir->d_name); // formatando saida
 
-        free(out.pData);
-	}
+        printf("%s", outpath);
 
+        writePGMImage(&out, outpath);
+
+        if (img.pData) {
+            free(img.pData);
+            img.pData = NULL;
+        }
+
+        if (out.pData) {
+            free(out.pData);
+            out.pData = NULL;
+        }
+    }
+
+    closedir(d);
+
+    if (dist) free(dist);
+    if (clusters) free(clusters);
+    if (c) free(c);
+    if (c2) free(c2);
+
+    //frees
 
 	end = clock();
 
