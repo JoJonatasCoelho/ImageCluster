@@ -1,14 +1,11 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#define MX_INTERA 10
 
 #include "../include/cluster.h"
-#include "../include/pgm.h"
 
 void centroides_iniciais(unsigned char *imgData, unsigned long tam, int k, float *c ){
-	for(int i=0; i<k; i++){
+	for(int i = 0; i < k; i++){
 		*(c + i) = imgData[rand() % tam];
 	}
 }
@@ -17,15 +14,15 @@ void calcular_distancia(unsigned char *imgData, unsigned char *clusters, unsigne
 
     memset(dist, 0, tam * sizeof(float));
 
-		for(int j=0; j<k; j++){//for para percorrer os centroides
+		for(int j = 0; j < k; j++){//for para percorrer os centroides
 			for(unsigned long i = 0; i < tam; i++){ //for para percorrer os pixels da imagem
-				float dist_atual = fabsf(c[j] - imgData[i]);
-				if(j == 0){
+				float dist_atual = fabsf(c[j] - imgData[i]); // calculo da distancia de forma linear por conta dos valores das cores mudarem linearmente
+				if(j == 0){ // na primeira iteração todos sao do mesmo grupo
 					dist[i] = dist_atual;
-					clusters[i] = j; // j representa o grupo aqui e mask é uma mascara que determina o grupo pertecente a aquele pixel
+					clusters[i] = j; // j representa o grupo aqui e clusters é uma mascara que determina o grupo pertecente a aquele pixel
 				}
 
-				if (dist[i] > dist_atual){
+				if (dist[i] > dist_atual){ // a partir das próximas iteraçoes e achado o verdadeiro grupo de cada pixel
 					clusters[i] = j;
 					dist[i] = dist_atual;
 				}
@@ -36,7 +33,7 @@ void calcular_distancia(unsigned char *imgData, unsigned char *clusters, unsigne
 
 int novosCentroides(unsigned char *imgData, unsigned char *clusters,  unsigned long tam, float *c, unsigned k){
 
-	unsigned long sums = 0;
+	unsigned long sums = 0; // variaveis necessarias para fazer a media do kmeans
 
 	unsigned long counts = 0;
 
@@ -46,16 +43,17 @@ int novosCentroides(unsigned char *imgData, unsigned char *clusters,  unsigned l
         sums = 0;
         counts = 0;
 
-	    for(unsigned long  i=0; i<tam; i++){
-		    sums += (*(clusters + i) == k) ? *(imgData + i) : 0;
-    		counts += (*(clusters + i) == k) ? 1 : 0;
+	    for(unsigned long j = 0; j < tam; j++){
+		    sums += (*(clusters + j) == i) ? *(imgData + j) : 0;
+    		counts += (*(clusters + j) == i) ? 1 : 0;
     	}
 
 		if (counts != 0){
-		    *(c + i) = sums / counts;
+		    *(c + i) = (float) sums / counts;
+            *(c + i) = (*(c + i) > 255) ? 255 : *(c + i); // o valor maximo e 255 por isso e feito esse ternario
         }else
-            *(c + i) = *(imgData + rand() % tam);
-	}
+            *(c + i) = *(c + i); // caso aja erro na media o cluster continua o mesmo
+}
 
 	return EXIT_SUCCESS;
 
@@ -63,31 +61,20 @@ int novosCentroides(unsigned char *imgData, unsigned char *clusters,  unsigned l
 
 int converge(float *c,float *c2, int k){
 	int convergiu = 0;
-	for(int j=0; j<k; j++){
+	for(int j = 0; j < k; j++){
 		if (c2[j] == c[j]) convergiu ++;
 	}
 	if (convergiu == k)
-		return 1;
-	return 0;
+		return CONVERGIU;
+	return DIVERGIU;
 }
-int preencherPGM(const unsigned char const *pDataIn, unsigned char *pDataout,const unsigned char *clusters, const unsigned k, const unsigned long tam, float *c){
-	unsigned char *cores = malloc(sizeof(unsigned char) * k);
+int preencherPGM(const unsigned char *pDataIn, unsigned char *pDataout,const unsigned char *clusters, const unsigned k, const unsigned long tam, float *c){
 
-    if (!cores) {
-	    fprintf(stderr, "Erro ao alocar memória para cores.\n");
-        return EXIT_FAILURE;
-    }
+	for(unsigned long j = 0; j < tam; j++){
+		*(pDataout + j) = (int)*(c + *(clusters + j));
+	}
 
-
-		for(unsigned char i=0; i<k; i++){
-			cores[i] = pDataIn[(int) c[i]];
-
-		}
-		for(unsigned long j=0; j<tam; j++){
-			pDataout[j] = cores[clusters[j]];
-		}
-
-		return EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }
 
 int cluster(unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, unsigned long tam, float *dist, unsigned char *clusters, float *c, float *c2) {
@@ -105,8 +92,6 @@ int cluster(unsigned char *pDataIn, unsigned char *pDataOut, const unsigned k, u
             for (int i = 0; i < k; i++) c2[i] = c[i];
             convergiu = 0;
         }
-
-        printf("%d \n", n);
 
         if (convergiu == k)
             break;
