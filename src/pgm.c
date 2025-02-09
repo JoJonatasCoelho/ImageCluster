@@ -45,13 +45,13 @@ void readPGMImage(pgm *pio, char *filename){
 
 	switch(pio->tipo){
 		case 2:
-			puts("Lendo imagem PGM (dados em texto)");
+			// puts("Lendo imagem PGM (dados em texto)");
 			for (int k=0; k < (pio->r * pio->c); k++){
 				fscanf(fp, "%hhu", pio->pData+k);
 			}
 		break;
 		case 5:
-			puts("Lendo imagem PGM (dados em binário)");
+			// puts("Lendo imagem PGM (dados em binário)");
 			fread(pio->pData,sizeof(unsigned char),pio->r * pio->c, fp);
 		break;
 		default:

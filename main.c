@@ -103,8 +103,6 @@ int main(int argc, char *argv[])
 
         snprintf(outpath, sizeof(outpath), "%s%s%s",  argv[2], "out-",dir->d_name); // formatando saida
 
-        printf("%s", outpath);
-
         writePGMImage(&out, outpath);
 
         if (img.pData) {
