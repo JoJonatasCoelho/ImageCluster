@@ -6,7 +6,6 @@
 
 void readPGMImage(pgm *pio, char *filename){
 
-
 	FILE *fp;
 	char ch;
 
@@ -15,7 +14,6 @@ void readPGMImage(pgm *pio, char *filename){
 		perror("Erro.");
 		exit(1);
 	}
-
 
 	if ( (ch = getc(fp))!='P'){
 		puts("A imagem fornecida não está no formato pgm");
@@ -26,26 +24,24 @@ void readPGMImage(pgm *pio, char *filename){
 
 	fseek(fp,1, SEEK_CUR);
 
-
 	while((ch=getc(fp))=='#'){
 		while( (ch=getc(fp))!='\n');
 	}
 
-
 	fseek(fp,-1, SEEK_CUR);
 
-
 	fscanf(fp, "%d %d",&pio->c,&pio->r);
+
 	if (ferror(fp)){
 		perror(NULL);
 		exit(3);
 	}
+
 	fscanf(fp, "%d",&pio->mv);
+
 	fseek(fp,1, SEEK_CUR);
 
-
 	pio->pData = (unsigned char*) malloc(pio->r * pio->c * sizeof(unsigned char));
-
 
 	switch(pio->tipo){
 		case 2:
@@ -71,15 +67,13 @@ void readPGMImage(pgm *pio, char *filename){
 void writePGMImage(pgm *pio, char *filename){
 
 	FILE *fp;
-	char ch;
 
-    
     if (!filename) {
         fprintf(stderr, "Erro: filename é NULL.\n");
         exit(1);
     }
 
-    
+
     if (!pio->pData) {
         fprintf(stderr, "Erro: pio->pData é NULL.\n");
         exit(1);
@@ -103,9 +97,6 @@ void writePGMImage(pgm *pio, char *filename){
 
 
 }
-
-
-
 
 void viewPGMImage(pgm *pio){
 	printf("Tipo: %d\n",pio->tipo);
