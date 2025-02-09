@@ -1,3 +1,15 @@
+/****************************************************************************
+*                                                                          
+* Aluno: Jonatas Cleyton Fonseca Coelho                                                      
+* Matricula: 12345                                                          
+*                                                                          
+* Avaliacao 04: Trabalho Final                                              
+* 04.505.23-2024.2 - Prof. Daniel Ferreira                                  
+*                                                                          
+* Compilador: gcc version 13.3.0 (Ubuntu 13.3.0-6ubuntu2~24.04)                    
+*                                                                           
+****************************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -60,7 +72,7 @@ int main(int argc, char *argv[])
 
         if (!img.pData) {
             fprintf(stderr, "Erro ao ler a imagem: %s\n", filepath);
-            continue; // Pula para a próxima iteração caso erro em alguma imagem
+            return EXIT_FAILURE; //para a execuçao do programa caso aja falha ao ler uma imagem sequer
         }
 
         out.c = img.c;
@@ -100,7 +112,6 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
         }
 
-
         snprintf(outpath, sizeof(outpath), "%s%s%s",  argv[2], "out-",dir->d_name); // formatando saida
 
         writePGMImage(&out, outpath);
@@ -116,7 +127,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    closedir(d);
+    closedir(d); //fecha o arquivo do diretorio
 
     if (dist) free(dist);
     if (clusters) free(clusters);
