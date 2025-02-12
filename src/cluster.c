@@ -13,10 +13,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <omp.h>
 
 #include "../include/cluster.h"
 
 void centroides_iniciais(unsigned char *imgData, unsigned long tam, int k, float *c ){
+	#pragma omp parallel for
 	for(int i = 0; i < k; i++){
 		*(c + i) = imgData[rand() % tam];//escolhendo os centroides de forma aleatória
 	}
@@ -26,6 +28,7 @@ void calcular_distancia(unsigned char *imgData, unsigned char *clusters, unsigne
 
     memset(dist, 0, tam * sizeof(float));
 
+		#pragma omp parallel for
 		for(int j = 0; j < k; j++){//for para percorrer os centroides
 			for(unsigned long i = 0; i < tam; i++){ //for para percorrer os pixels da imagem
 				float dist_atual = fabsf(c[j] - imgData[i]); // calculo da distancia de forma linear por conta dos valores das cores mudarem linearmente
@@ -49,7 +52,7 @@ int novosCentroides(unsigned char *imgData, unsigned char *clusters,  unsigned l
 
 	unsigned long counts = 0;
 
-
+	
 	for (unsigned i = 0; i < k; i++)
 	{
         sums = 0;
@@ -73,6 +76,8 @@ int novosCentroides(unsigned char *imgData, unsigned char *clusters,  unsigned l
 
 int converge(float *c,float *c2, int k){
 	int convergiu = 0;
+
+	#pragma omp parallel for reduction(+:convergiu)
 	for(int j = 0; j < k; j++){
 		if (c2[j] == c[j]) convergiu ++;
 	}
@@ -81,7 +86,7 @@ int converge(float *c,float *c2, int k){
 	return DIVERGIU;
 }
 int preencherPGM(const unsigned char *pDataIn, unsigned char *pDataout,const unsigned char *clusters, const unsigned k, const unsigned long tam, float *c){
-
+	#pragma omp parallel for
 	for(unsigned long j = 0; j < tam; j++){
 		*(pDataout + j) = (int)*(c + *(clusters + j));
 	}
