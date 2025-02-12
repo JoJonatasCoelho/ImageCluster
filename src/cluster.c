@@ -1,6 +1,6 @@
 /****************************************************************************
 *                                                                          
-* Aluno: Jonatas Cleyton Fonseca Coelho                                                      
+* Aluno: Jonatas Cleyton Fonseca Coelho, Luiz Henrique Leite Porto Maia                                                      
 * Matricula: 12345                                                          
 *                                                                          
 * Avaliacao 04: Trabalho Final                                              
