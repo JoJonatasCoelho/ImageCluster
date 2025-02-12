@@ -1,3 +1,14 @@
+/****************************************************************************
+*                                                                          
+* Aluno: Jonatas Cleyton Fonseca Coelho                                                
+* Matricula: 20241045050120                                                          
+*                                                                          
+* Avaliacao 04: Trabalho Final                                              
+* 04.505.23-2024.2 - Prof. Daniel Ferreira                                  
+*                                                                          
+* Compilador: gcc version 13.3.0 (Ubuntu 13.3.0-6ubuntu2~24.04)                    
+*                                                                           
+****************************************************************************/
 #include <stdio.h>
 #include "../include/histograma.h"
 
