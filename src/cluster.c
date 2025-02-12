@@ -18,7 +18,7 @@
 
 void centroides_iniciais(unsigned char *imgData, unsigned long tam, int k, float *c ){
 	for(int i = 0; i < k; i++){
-		*(c + i) = imgData[rand() % tam];
+		*(c + i) = imgData[rand() % tam];//escolhendo os centroides de forma aleatória
 	}
 }
 
@@ -64,7 +64,7 @@ int novosCentroides(unsigned char *imgData, unsigned char *clusters,  unsigned l
 		    *(c + i) = (float) sums / counts;
             *(c + i) = (*(c + i) > 255) ? 255 : *(c + i); // o valor maximo e 255 por isso e feito esse ternario
         }else
-            *(c + i) = *(c + i); // caso aja erro na media o cluster continua o mesmo
+            *(c + i) = *(c + i); // caso haja erro na media o cluster continua o mesmo
 }
 
 	return EXIT_SUCCESS;

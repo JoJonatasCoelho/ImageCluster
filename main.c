@@ -1,13 +1,13 @@
 /****************************************************************************
-*                                                                          
-* Aluno: Jonatas Cleyton Fonseca Coelho                                                      
-* Matricula: 12345                                                          
-*                                                                          
-* Avaliacao 04: Trabalho Final                                              
-* 04.505.23-2024.2 - Prof. Daniel Ferreira                                  
-*                                                                          
-* Compilador: gcc version 13.3.0 (Ubuntu 13.3.0-6ubuntu2~24.04)                    
-*                                                                           
+*
+* Aluno: Jonatas Cleyton Fonseca Coelho
+* Matricula: 12345
+*
+* Avaliacao 04: Trabalho Final
+* 04.505.23-2024.2 - Prof. Daniel Ferreira
+*
+* Compilador: gcc version 13.3.0 (Ubuntu 13.3.0-6ubuntu2~24.04)
+*
 ****************************************************************************/
 
 #include <stdio.h>
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     srand(time(NULL));
 
    	if (argc!=4){
-    	printf("Formato: \n\t %s <input_dir/> <output_dir/> <k clusters>\n",argv[0]);
+    	printf("Formato: \n\t %s <input_dir>/ <output_dir>/ <k clusters>\n",argv[0]);
 	    exit(1);
    	}
 
@@ -55,14 +55,14 @@ int main(int argc, char *argv[])
     char outpath[1024]; // mesma coisa para o caminho de saida
 
 
-
+    // laço de repetição para percorrer todo o diretório de entrada
     while ((dir = readdir(d)) != NULL){
 
         pgm img = {0};
         pgm out = {0};
         // zero o valor dos structs sempre
 
-        if (strcmp(dir->d_name, ".") == 0 || strcmp(dir->d_name, "..") == 0) { // pra se livrar de um bug
+        if (strcmp(dir->d_name, ".") == 0 || strcmp(dir->d_name, "..") == 0) { //pra se livrar de um bug
             continue;
         }
 
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 
         if (!img.pData) {
             fprintf(stderr, "Erro ao ler a imagem: %s\n", filepath);
-            return EXIT_FAILURE; //para a execuçao do programa caso aja falha ao ler uma imagem sequer
+            return EXIT_FAILURE; //para a execuçao do programa caso haja falha ao ler uma imagem sequer
         }
 
         out.c = img.c;
@@ -112,6 +112,7 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
         }
 
+        // Gravando a imagem processada
         snprintf(outpath, sizeof(outpath), "%s%s%s",  argv[2], "out-",dir->d_name); // formatando saida
 
         writePGMImage(&out, outpath);
