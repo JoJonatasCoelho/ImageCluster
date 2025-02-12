@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <omp.h>
 #include <dirent.h>
 #include <string.h>
 #include "include/pgm.h"
@@ -36,7 +37,7 @@ int main(int argc, char *argv[])
 	double time_total=0;
 
 
-    begin = clock();
+    begin =omp_get_wtime();
 
     if(!d){
         perror("Erro ao abrir diretório");
@@ -137,10 +138,10 @@ int main(int argc, char *argv[])
 
     //frees
 
-	end = clock();
+	end = omp_get_wtime();
 
 
-	time_total = (double)(end - begin) / CLOCKS_PER_SEC;
+	time_total = (double)(end - begin);
 
 
 	printf("Tempo Total: %lf\n",time_total);
